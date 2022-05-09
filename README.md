@@ -1,73 +1,29 @@
-Blog: https://blog.codefarm.me/2018/06/29/elasticsearch-fluentd-kibana-docker-compose/[Docker Logging with EFK Stack]
+EFK-Docker
+==============
 
-[source,yaml]
-----
-version: "2.4"
-services:
-    elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-        restart: on-failure
-        mem_limit: 2g
-        environment:
-          - discovery.type=single-node
-        ports:
-          - 9200
-        volumes:
-          - /var/lib/elasticsearch:/usr/share/elasticsearch/data
-        networks:
-          - local
-        depends_on:
-          - fluent-bit
-        logging:
-          driver: fluentd
-          options:
-            tag: efk.es
-    kibana:
-        image: docker.elastic.co/kibana/kibana-oss:7.10.2
-        restart: on-failure
-        mem_limit: 256m
-        environment:
-          - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-        ports:
-          - 5601:5601
-        networks:
-          - local
-        depends_on:
-          - fluent-bit
-          - elasticsearch
-        logging:
-          driver: fluentd
-          options:
-            tag: efk.kibana
-    fluent-bit:
-        image: fluent/fluent-bit:1.8
-        command:
-          - /fluent-bit/bin/fluent-bit
-          - --config=/etc/fluent-bit/fluent-bit.conf
-        environment:
-          - FLB_ES_HOST=elasticsearch
-          - FLB_ES_PORT=9200
-        ports:
-          #- 2020:2020
-          - 24224:24224
-        volumes:
-          - ./conf/:/etc/fluent-bit/:ro
-        networks:
-          - local
-        logging:
-          driver: fluentd
-          options:
-            tag: efk.fluent-bit
-networks:
-  local:
-    driver: bridge
-----
+## Prerequisite
 
-[source,console]
-----
-$ sudo mkdir /var/lib/elasticsearch
-$ sudo chown 1000 /var/lib/elasticsearch
+Install `Rancher Desktop`, which is an alternative to `Docker Desktop`.
+
+1. Go to https://rancherdesktop.io/
+2. Download the installer image for your OS.
+3. Open Rancher and proceed installation.
+4. Choose `dockerd(moby)` when you are asked container engine.
+
+![choose dockerd(moby)](https://cdn-ak.f.st-hatena.com/images/fotolife/k/knqyf263/20220201/20220201220235.png)
+
+Once everything is set, Rancher starts internal kubernetes. Just wait for a while until the state becomes running.
+Even if you are not sure of kubernetes, no worry. Rancher takes care of necessary CLI tools as well.  It creates `~/.rd` and adds it to your PATH automatically under the hood.
+What you need here is `docker` and `docker-compose`.
+
+Here is the updated Yaml configuration for docker.
+I modified some parts so that you don't need extra steps.
+
+Let's start docker, and see what is happening on http://localhost:5601.
+
+```console
 $ docker-compose up 
+
 Creating network "efk-docker_local" with driver "bridge"
 Creating efk-docker_fluent-bit_1 ... done
 Creating efk-docker_elasticsearch_1 ... done
@@ -180,4 +136,4 @@ elasticsearch_1  | {"type": "server", "timestamp": "2022-01-12T02:04:27,923Z", "
 Stopping efk-docker_kibana_1        ... done
 Stopping efk-docker_elasticsearch_1 ... done
 Stopping efk-docker_fluent-bit_1    ... done
-----
+```

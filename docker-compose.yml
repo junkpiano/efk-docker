@@ -9,7 +9,7 @@ services:
         ports:
           - 9200
         volumes:
-          - /var/lib/elasticsearch:/usr/share/elasticsearch/data
+          - ./data/elasticsearch:/usr/share/elasticsearch/data
         networks:
           - local
         depends_on:
@@ -44,8 +44,10 @@ services:
           - FLB_ES_HOST=elasticsearch
           - FLB_ES_PORT=9200
         ports:
-          #- 2020:2020
+          - 2020:2020
           - 24224:24224
+          - 5140:5140/udp
+          - 9880:9880
         volumes:
           - ./conf/:/etc/fluent-bit/:ro
         networks:
