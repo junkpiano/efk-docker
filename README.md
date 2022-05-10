@@ -16,9 +16,6 @@ Once everything is set, Rancher starts internal kubernetes. Just wait for a whil
 Even if you are not sure of kubernetes, no worry. Rancher takes care of necessary CLI tools as well.  It creates `~/.rd` and adds it to your PATH automatically under the hood.
 What you need here is `docker` and `docker-compose`.
 
-Here is the updated Yaml configuration for docker.
-I modified some parts so that you don't need extra steps.
-
 Let's start docker, and see what is happening on http://localhost:5601.
 
 ```console
